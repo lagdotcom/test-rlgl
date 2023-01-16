@@ -1,0 +1,19 @@
+{
+  "name": "test-rlgl",
+  "version": "1.0.0",
+  "description": "Mucking about with toji's GL tile renderer",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --sourcemap --outfile=docs/bundle.js --loader:.png=file --loader:.shader=text",
+    "watch": "esbuild src/index.ts --watch --bundle --sourcemap --outfile=docs/bundle.js --loader:.png=file --loader:.shader=text",
+    "serve": "http-server docs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lag.Com <lagdotcom@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.16.17",
+    "http-server": "^14.1.1",
+    "typescript": "^4.9.4"
+  }
+}
