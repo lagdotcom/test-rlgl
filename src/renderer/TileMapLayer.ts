@@ -79,6 +79,10 @@ export default class TileMapLayer {
     return [data.data[i], data.data[i + 1]];
   }
 
+  contains(x: number, y: number) {
+    return x >= 0 && y >= 0 && x < this.canvas.width && y < this.canvas.height;
+  }
+
   dump() {
     const { canvas, data } = this;
 

@@ -139,6 +139,9 @@ ${info}`;
       const i = (y * canvas.width + x) * 4;
       return [data.data[i], data.data[i + 1]];
     }
+    contains(x, y) {
+      return x >= 0 && y >= 0 && x < this.canvas.width && y < this.canvas.height;
+    }
     dump() {
       const { canvas, data } = this;
       let i = 0;
@@ -359,20 +362,21 @@ ${info}`;
       const height = image.naturalHeight * tileScale;
       tilesCanvas.width = width;
       tilesCanvas.height = height;
-      panel.style.flexBasis = `${Math.max(200, width)}px`;
+      panel.style.flexBasis = `${width}px`;
+      tiles2d.imageSmoothingEnabled = false;
       tiles2d.drawImage(image, 0, 0, width, height);
       chooseTile(0, 0);
       tilesCanvas.addEventListener("click", (e) => {
         const size = tileSize * tileScale;
-        let x = Math.floor(e.offsetX / size);
-        let y = Math.floor(e.offsetY / size);
+        const x = Math.floor(e.offsetX / size);
+        const y = Math.floor(e.offsetY / size);
         chooseTile(x, y);
       });
       main.addEventListener("click", (e) => {
         const size = tileSize * tileScale;
-        let x = Math.floor(e.offsetX / size);
-        let y = Math.floor(e.offsetY / size);
-        if (x >= 0 && y >= 0) {
+        const x = Math.floor(e.offsetX / size);
+        const y = Math.floor(e.offsetY / size);
+        if (map.contains(x, y)) {
           const [u, v] = map.get(x, y);
           if (tileX === u && tileY === v)
             map.draw(x, y, 255, 255);
@@ -380,6 +384,7 @@ ${info}`;
             map.draw(x, y, tileX, tileY);
         }
       });
+      onResize();
     });
     const [main, gl] = getCanvasAndContext("webgl");
     main.id = "game";
@@ -387,20 +392,20 @@ ${info}`;
     gl.clearDepth(1);
     const tm = new TileMap(gl);
     tm.setSpriteSheet(tiles_default);
-    const map = tm.addTileLayer(map_default, 0);
     tm.tileSize = tileSize;
     tm.setTileScale(tileScale);
+    const map = tm.addTileLayer(map_default, 0);
+    const getMainSize = () => {
+      const width = window.innerWidth - tilesCanvas.width;
+      const height = window.innerHeight;
+      return [width / window.devicePixelRatio, height / window.devicePixelRatio];
+    };
     const onResize = () => {
-      const isMobile = screen.width <= 960;
-      if (isMobile) {
-        main.width = window.innerWidth * window.devicePixelRatio;
-        main.height = window.innerHeight * window.devicePixelRatio;
-      } else {
-        main.width = main.offsetWidth;
-        main.height = main.offsetHeight;
-      }
-      gl.viewport(0, 0, main.width, main.height);
-      tm.resizeViewport(main.width, main.height);
+      const [width, height] = getMainSize();
+      main.width = width;
+      main.height = height;
+      gl.viewport(0, 0, width, height);
+      tm.resizeViewport(width, height);
     };
     window.addEventListener("resize", onResize);
     requestAnimationFrame(onResize);
